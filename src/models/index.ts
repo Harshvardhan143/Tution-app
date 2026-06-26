@@ -16,3 +16,4 @@ export * from './Announcement';
 export * from './AcademicCalendar';
 export * from './PaySlip';
 export * from './AuditLog';
+export * from './TokenBlacklist';

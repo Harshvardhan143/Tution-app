@@ -14,6 +14,10 @@ export interface IUser extends Document {
   isDeleted: boolean;
   loginAttempts: number;
   lockUntil?: Date;
+  otp?: {
+    code: string;
+    expiresAt: Date;
+  };
   requirePasswordChange: boolean;
   passwordChangedAt?: Date;
   lastLoginAt?: Date;
@@ -35,6 +39,10 @@ const userSchema = new Schema<IUser>(
     isDeleted: { type: Boolean, default: false },
     loginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date },
+    otp: {
+      code: { type: String },
+      expiresAt: { type: Date },
+    },
     requirePasswordChange: { type: Boolean, default: false },
     passwordChangedAt: { type: Date },
     lastLoginAt: { type: Date },
