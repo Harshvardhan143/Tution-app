@@ -16,3 +16,47 @@ export async function getEventsForStudent(dateRange?: { startDate?: string; endD
 
   return events;
 }
+
+export async function getAllEvents() {
+  return AcademicCalendar.find()
+    .sort({ fromDate: 1 })
+    .lean();
+}
+
+export async function createEvent(data: {
+  title: string;
+  description?: string;
+  type: string;
+  fromDate: Date;
+  toDate?: Date;
+  targetRole?: string;
+  targetGrade?: string;
+  targetBatch?: string;
+}) {
+  const event = await AcademicCalendar.create(data);
+  return event;
+}
+
+export async function updateEvent(eventId: string, data: Record<string, unknown>) {
+  const event = await AcademicCalendar.findByIdAndUpdate(
+    eventId,
+    { $set: data },
+    { new: true }
+  );
+
+  if (!event) {
+    throw new Error('Event not found');
+  }
+
+  return event;
+}
+
+export async function deleteEvent(eventId: string) {
+  const event = await AcademicCalendar.findByIdAndDelete(eventId);
+  
+  if (!event) {
+    throw new Error('Event not found');
+  }
+
+  return event;
+}

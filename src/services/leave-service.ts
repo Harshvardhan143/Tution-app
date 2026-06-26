@@ -67,3 +67,30 @@ export async function cancelLeave(userId: string, leaveId: string) {
   await leave.deleteOne();
   return { success: true };
 }
+
+export async function getAllLeaves(statusFilter?: string) {
+  const query: Record<string, unknown> = {};
+  if (statusFilter && statusFilter !== 'all') {
+    query.status = statusFilter;
+  }
+
+  return Leave.find(query)
+    .populate('staff', 'name profilePicture')
+    .sort({ createdAt: -1 })
+    .lean();
+}
+
+export async function updateLeaveStatus(leaveId: string, data: { status: 'approved' | 'rejected', adminRemarks?: string }) {
+  const leave = await Leave.findById(leaveId);
+  if (!leave) {
+    throw new AppError('Leave request not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  leave.status = data.status;
+  if (data.adminRemarks) {
+    leave.adminRemarks = data.adminRemarks;
+  }
+
+  await leave.save();
+  return leave;
+}

@@ -56,3 +56,85 @@ export async function getStudentTimetable(userId: string) {
 
   return timetables;
 }
+
+export async function getAllTimetables() {
+  return Timetable.find()
+    .populate('slots.subject', 'name code')
+    .populate('slots.staff', 'name profilePicture')
+    .sort({ grade: 1, batch: 1, dayOfWeek: 1 })
+    .lean();
+}
+
+export async function createTimetable(data: {
+  batch: string;
+  grade: string;
+  dayOfWeek: number;
+  slots: Array<{
+    startTime: string;
+    endTime: string;
+    subjectId: string;
+    staffId?: string;
+    room?: string;
+    type: 'lecture' | 'lab' | 'tutorial';
+  }>;
+}) {
+  const existing = await Timetable.findOne({
+    batch: data.batch,
+    dayOfWeek: data.dayOfWeek,
+  });
+
+  if (existing) {
+    throw new AppError('Timetable already exists for this batch on this day', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  const timetable = await Timetable.create({
+    ...data,
+    slots: data.slots.map(s => ({
+      ...s,
+      subject: s.subjectId,
+      staff: s.staffId,
+    })),
+    isActive: true,
+  });
+
+  return timetable;
+}
+
+export async function updateTimetable(timetableId: string, data: Record<string, unknown>) {
+  const timetable = await Timetable.findById(timetableId);
+  if (!timetable) {
+    throw new AppError('Timetable not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const updatableFields = ['batch', 'grade', 'dayOfWeek', 'slots', 'isActive'];
+  
+  for (const field of updatableFields) {
+    if (data[field] !== undefined) {
+      if (field === 'slots') {
+        const slotsData = data[field] as Array<{ subjectId?: string; subject?: string; staffId?: string; staff?: string; [key: string]: unknown }>;
+        timetable.slots = slotsData.map(s => ({
+          ...s,
+          subject: s.subjectId || s.subject,
+          staff: s.staffId || s.staff,
+        })) as unknown as typeof timetable.slots;
+      } else {
+        (timetable as Record<string, unknown>)[field] = data[field];
+      }
+    }
+  }
+
+  await timetable.save();
+  return timetable;
+}
+
+export async function deleteTimetable(timetableId: string) {
+  const timetable = await Timetable.findById(timetableId);
+  if (!timetable) {
+    throw new AppError('Timetable not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  timetable.isActive = false;
+  await timetable.save();
+
+  return timetable;
+}
