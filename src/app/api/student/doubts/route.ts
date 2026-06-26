@@ -13,7 +13,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
 export const POST = withApiHandler(async (req: NextRequest) => {
   const user = await requireRole(req, [ROLES.STUDENT]);
-  const formData = await req.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = (await req.formData()) as any;
   
   const subjectId = formData.get('subjectId');
   const question = formData.get('question');

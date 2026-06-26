@@ -18,7 +18,8 @@ const uploadMaterialSchema = z.object({
 export const POST = withApiHandler(async (req: NextRequest) => {
   const user = await requireRole(req, [ROLES.STAFF, ROLES.ADMIN]);
   
-  const formData = await req.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = (await req.formData()) as any;
   
   const subjectId = formData.get('subjectId') as string;
   const title = formData.get('title') as string;

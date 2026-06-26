@@ -14,7 +14,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 
 export const PATCH = withApiHandler(async (req: NextRequest) => {
   const user = await requireRole(req, [ROLES.STAFF, ROLES.ADMIN]);
-  const formData = await req.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = (await req.formData()) as any;
   
   const name = formData.get('name') as string | null;
   const phone = formData.get('phone') as string | null;
