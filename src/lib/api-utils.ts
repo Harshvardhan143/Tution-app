@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { AppError } from './errors';
 import { HTTP_STATUS } from '@/config/constants';
 import { connectDB } from './server/mongoose';
@@ -6,6 +6,7 @@ import { auditLog } from './audit-logger';
 
 export interface ApiResponse<T = unknown> {
   success: boolean;
+  message?: string;
   data?: T;
   error?: {
     message: string;
@@ -14,9 +15,26 @@ export interface ApiResponse<T = unknown> {
   };
 }
 
-export function successResponse<T>(data: T, statusCode: number = HTTP_STATUS.OK) {
+export function successResponse<T>(
+  data: T,
+  messageOrStatus?: string | number,
+  statusCodeOverride?: number
+) {
+  let message: string | undefined;
+  let statusCode: number = HTTP_STATUS.OK;
+
+  if (typeof messageOrStatus === 'string') {
+    message = messageOrStatus;
+    if (typeof statusCodeOverride === 'number') {
+      statusCode = statusCodeOverride;
+    }
+  } else if (typeof messageOrStatus === 'number') {
+    statusCode = messageOrStatus;
+  }
+
   const responseBody: ApiResponse<T> = {
     success: true,
+    message,
     data,
   };
   return NextResponse.json(responseBody, { status: statusCode });
@@ -39,7 +57,7 @@ type ApiHandlerContext = {
 };
 
 type ApiHandler = (
-  req: Request,
+  req: NextRequest,
   context: ApiHandlerContext
 ) => Promise<NextResponse> | NextResponse;
 
@@ -48,7 +66,7 @@ type ApiHandler = (
  * standardized JSON formats, and request logging.
  */
 export function withApiHandler(handler: ApiHandler) {
-  return async (req: Request, context: ApiHandlerContext) => {
+  return async (req: NextRequest, context: ApiHandlerContext) => {
     const startTime = Date.now();
     const url = new URL(req.url);
     const method = req.method;

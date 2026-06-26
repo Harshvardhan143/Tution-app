@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { env } from '@/config/env';
 import { SECURITY } from '@/config/constants';
-import { redis } from './redis';
+import { TokenBlacklist } from '@/models/TokenBlacklist';
 
 export interface TokenPayload {
   userId: string;
@@ -112,19 +112,28 @@ export function verifyRefreshToken(token: string): TokenPayload | null {
 }
 
 /**
- * Add a JWT ID (JTI) to the Redis blacklist to revoke the token immediately.
+ * Revokes a token by its JTI by adding it to the MongoDB TokenBlacklist.
+ * The TTL index will auto-delete it after the expiry time.
+ * @param jti The JWT ID
+ * @param expiresInSeconds Number of seconds until the token would naturally expire
  */
-export async function revokeToken(jti: string, expirySeconds: number): Promise<void> {
-  const blacklistKey = `${SECURITY.REDIS_BLACKLIST_PREFIX}${jti}`;
-  // Store with value '1' and expire automatically
-  await redis.set(blacklistKey, '1', 'EX', Math.max(1, Math.ceil(expirySeconds)));
+export async function revokeToken(jti: string, expiresInSeconds: number): Promise<void> {
+  const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+  try {
+    await TokenBlacklist.create({ jti, expiresAt });
+  } catch (error: unknown) {
+    // Ignore duplicate key error (11000) if already revoked
+    const mongoError = error as { code?: number };
+    if (mongoError.code !== 11000) {
+      throw error;
+    }
+  }
 }
 
 /**
- * Check if the JWT ID (JTI) is listed in the Redis blacklist.
+ * Check if the JWT ID (JTI) is listed in the MongoDB blacklist.
  */
 export async function isTokenRevoked(jti: string): Promise<boolean> {
-  const blacklistKey = `${SECURITY.REDIS_BLACKLIST_PREFIX}${jti}`;
-  const isBlacklisted = await redis.get(blacklistKey);
-  return isBlacklisted === '1';
+  const blacklisted = await TokenBlacklist.findOne({ jti });
+  return !!blacklisted;
 }
