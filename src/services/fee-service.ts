@@ -67,3 +67,78 @@ export async function generateFeeReceiptPdf(receiptId: string, userId: string): 
     }
   });
 }
+
+export async function getAllFees() {
+  return Fee.find()
+    .populate('student', 'name email phone profilePicture')
+    .sort({ academicYear: -1 })
+    .lean();
+}
+
+export async function createFeeRecord(data: {
+  studentId: string;
+  academicYear: string;
+  feeHeads: Array<{ name: string; amount: number; dueDate: Date }>;
+}) {
+  const existingFee = await Fee.findOne({ student: data.studentId, academicYear: data.academicYear });
+  if (existingFee) {
+    throw new AppError('Fee record already exists for this academic year', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  const totalDue = data.feeHeads.reduce((acc, head) => acc + head.amount, 0);
+
+  const fee = await Fee.create({
+    student: data.studentId,
+    academicYear: data.academicYear,
+    feeHeads: data.feeHeads.map(h => ({ ...h, status: 'pending' })),
+    totalDue,
+    totalPaid: 0,
+    pendingAmount: totalDue,
+    receipts: [],
+  });
+
+  return fee;
+}
+
+export async function markFeePayment(feeId: string, data: {
+  amount: number;
+  paymentMode: 'cash' | 'upi' | 'bank_transfer' | 'cheque';
+  paymentRef?: string;
+  feeHeadsPaid: Array<{ name: string; amount: number }>;
+}) {
+  const fee = await Fee.findById(feeId);
+  if (!fee) {
+    throw new AppError('Fee record not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const receiptNo = `REC-${Date.now()}`;
+
+  fee.receipts.push({
+    receiptNo,
+    date: new Date(),
+    amount: data.amount,
+    paymentMode: data.paymentMode,
+    paymentRef: data.paymentRef,
+    feeHeads: data.feeHeadsPaid,
+  });
+
+  fee.totalPaid += data.amount;
+  fee.pendingAmount = fee.totalDue - fee.totalPaid;
+
+  // Update status of fee heads
+  for (const headPaid of data.feeHeadsPaid) {
+    const feeHead = fee.feeHeads.find((h: { name: string; amount: number; status: string }) => h.name === headPaid.name);
+    if (feeHead) {
+      // Very basic logic: if amount paid equals amount due, mark paid. 
+      // More complex logic needed for partial payments per head.
+      if (headPaid.amount >= feeHead.amount) {
+        feeHead.status = 'paid';
+      } else {
+        feeHead.status = 'partial';
+      }
+    }
+  }
+
+  await fee.save();
+  return fee;
+}

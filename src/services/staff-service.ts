@@ -49,3 +49,83 @@ export async function updateStaffProfile(
 
   return getStaffProfile(userId);
 }
+
+export async function getAllStaff() {
+  return Staff.find()
+    .populate('user', 'name email phone isActive')
+    .sort({ 'user.name': 1 })
+    .lean();
+}
+
+export async function createStaff(data: {
+  name: string;
+  email: string;
+  phone: string;
+  employeeCode: string;
+  qualification: string;
+  salary: number;
+  batches: string[];
+}) {
+  const existingUser = await User.findOne({ email: data.email });
+  if (existingUser) {
+    throw new AppError('Email already exists', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  // Create User
+  const user = new User({
+    name: data.name,
+    email: data.email,
+    phone: data.phone,
+    role: 'staff',
+    isActive: true,
+  });
+
+  // Hash a default password
+  await user.setPassword('Staff@123'); // Default password
+  await user.save();
+
+  // Create Staff
+  const staff = await Staff.create({
+    user: user._id,
+    employeeCode: data.employeeCode,
+    qualification: data.qualification,
+    salary: data.salary,
+    batches: data.batches,
+    joiningDate: new Date(),
+  });
+
+  return { user, staff };
+}
+
+export async function updateStaff(staffId: string, data: Record<string, unknown>) {
+  const staff = await Staff.findById(staffId);
+  if (!staff) {
+    throw new AppError('Staff not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const updatableFields = ['employeeCode', 'qualification', 'salary', 'batches'];
+  
+  for (const field of updatableFields) {
+    if (data[field] !== undefined) {
+      (staff as Record<string, unknown>)[field] = data[field];
+    }
+  }
+
+  await staff.save();
+  return staff;
+}
+
+export async function toggleStaffStatus(staffId: string, isActive: boolean) {
+  const staff = await Staff.findById(staffId);
+  if (!staff) {
+    throw new AppError('Staff not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const user = await User.findById(staff.user);
+  if (user) {
+    user.isActive = isActive;
+    await user.save();
+  }
+
+  return { staff, user };
+}

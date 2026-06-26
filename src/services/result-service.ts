@@ -18,6 +18,14 @@ export async function getStudentResults(userId: string, academicYear?: string) {
   return results;
 }
 
+export async function getAllResults() {
+  return Result.find()
+    .populate('student', 'name email phone rollNo')
+    .populate('results.subject', 'name code')
+    .sort({ testDate: -1 })
+    .lean();
+}
+
 export async function enterBulkResults(userId: string, data: {
   academicYear: string;
   term: string;
