@@ -1,0 +1,26 @@
+node_modules/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+
+# Expo / React Native
+.expo/
+dist/
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# Next.js
+.next/
+out/
+build/
+
+# Project Documents and Assets
+pics/
+*.md
+!README.md
+!.github/PULL_REQUEST_TEMPLATE.md
