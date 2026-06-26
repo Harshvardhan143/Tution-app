@@ -1,7 +1,9 @@
 import { Student } from '@/models/Student';
+import { Staff } from '@/models/Staff';
 import { LMSMaterial } from '@/models/LMSMaterial';
 import { AppError } from '@/lib/errors';
 import { HTTP_STATUS } from '@/config/constants';
+import { uploadFile } from '@/lib/server/cloudinary';
 import '@/models/Subject';
 import '@/models/User';
 
@@ -61,4 +63,43 @@ export async function getMaterialsBySubject(
       totalPages: Math.ceil(totalCount / limit),
     }
   };
+}
+
+export async function uploadMaterial(userId: string, data: {
+  subjectId: string;
+  title: string;
+  type: 'pdf' | 'video' | 'link' | 'image';
+  url?: string;
+  fileBuffer?: Buffer;
+  grade: string;
+  batch: string;
+}) {
+  const staff = await Staff.findOne({ user: userId }).lean();
+  if (!staff) {
+    throw new AppError('Staff profile not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  let finalUrl = data.url;
+
+  if (data.fileBuffer && (data.type === 'pdf' || data.type === 'image' || data.type === 'video')) {
+    const uploadResult = await uploadFile(data.fileBuffer, 'eduspark/lms');
+    finalUrl = uploadResult.secure_url;
+  }
+
+  if (!finalUrl) {
+    throw new AppError('Material URL or file is required', HTTP_STATUS.BAD_REQUEST);
+  }
+
+  const material = await LMSMaterial.create({
+    subject: data.subjectId,
+    title: data.title,
+    type: data.type,
+    url: finalUrl,
+    uploadedBy: userId,
+    grade: data.grade,
+    batch: data.batch,
+    isActive: true,
+  });
+
+  return material;
 }

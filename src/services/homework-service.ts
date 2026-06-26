@@ -3,6 +3,7 @@ import { Student } from '@/models/Student';
 import { AppError } from '@/lib/errors';
 import { HTTP_STATUS } from '@/config/constants';
 import mongoose from 'mongoose';
+import { Staff } from '@/models/Staff';
 import '@/models/Subject';
 import '@/models/User';
 
@@ -53,6 +54,46 @@ export async function markHomeworkSubmitted(homeworkId: string, userId: string) 
   }
 
   await homework.save();
+
+  return homework;
+}
+
+export async function getStaffHomework(userId: string) {
+  const staff = await Staff.findOne({ user: userId }).lean();
+  if (!staff) {
+    throw new AppError('Staff profile not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const homeworks = await Homework.find({ assignedBy: userId })
+    .populate('subject', 'name code')
+    .sort({ dueDate: -1 })
+    .lean();
+
+  return homeworks;
+}
+
+export async function createHomework(userId: string, data: {
+  title: string;
+  description: string;
+  subjectId: string;
+  batch: string;
+  dueDate: Date;
+  attachmentUrl?: string;
+}) {
+  const staff = await Staff.findOne({ user: userId }).lean();
+  if (!staff) {
+    throw new AppError('Staff profile not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  const homework = await Homework.create({
+    title: data.title,
+    description: data.description,
+    subject: data.subjectId,
+    batch: data.batch,
+    assignedBy: userId,
+    dueDate: data.dueDate,
+    attachmentUrl: data.attachmentUrl,
+  });
 
   return homework;
 }
