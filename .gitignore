@@ -18,3 +18,9 @@ yarn-error.*
 .next/
 out/
 build/
+
+# Project Documents and Assets
+pics/
+*.md
+!README.md
+!.github/PULL_REQUEST_TEMPLATE.md
