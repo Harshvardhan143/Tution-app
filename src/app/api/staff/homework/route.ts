@@ -24,7 +24,8 @@ export const GET = withApiHandler(async (req: NextRequest) => {
 export const POST = withApiHandler(async (req: NextRequest) => {
   const user = await requireRole(req, [ROLES.STAFF]);
   
-  const formData = await req.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = (await req.formData()) as any;
   
   const title = formData.get('title') as string;
   const description = formData.get('description') as string;

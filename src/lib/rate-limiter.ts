@@ -28,7 +28,7 @@ if (typeof setInterval !== 'undefined') {
         memoryStore.delete(key);
       }
     }
-  }, 5 * 60 * 1000).unref();
+  }, 5 * 60 * 1000);
 }
 
 /**

@@ -11,7 +11,8 @@ import { Subject } from '@/models/Subject';
 export const POST = withApiHandler(async (req: NextRequest) => {
   const user = await requireRole(req, [ROLES.ADMIN]);
   
-  const formData = await req.formData();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formData = (await req.formData()) as any;
   const file = formData.get('file');
 
   if (!(file instanceof File)) {
