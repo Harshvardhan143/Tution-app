@@ -60,6 +60,41 @@ export async function uploadImage(
   });
 }
 
+export async function uploadFile(
+  fileBuffer: Buffer,
+  folder: string = 'eduspark/materials'
+): Promise<UploadResult> {
+  if (isMock || env.NODE_ENV === 'test') {
+    const mockId = `mock_${Math.random().toString(36).substring(7)}`;
+    return {
+      secure_url: `https://res.cloudinary.com/demo/raw/upload/v1600000000/${folder}/${mockId}.pdf`,
+      public_id: `${folder}/${mockId}`,
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      {
+        folder,
+        resource_type: 'auto',
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload stream failed:', error);
+          return reject(new Error(`File upload failed: ${error.message}`));
+        }
+        if (!result) {
+          return reject(new Error('File upload failed: Empty result from Cloudinary'));
+        }
+        resolve({
+          secure_url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+    ).end(fileBuffer);
+  });
+}
+
 /**
  * Deletes an image from Cloudinary by its public ID.
  */

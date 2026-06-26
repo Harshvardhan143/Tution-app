@@ -21,6 +21,38 @@ export async function getProfile(userId: string) {
   };
 }
 
+export async function searchStudents(query: { search?: string; batch?: string; grade?: string }) {
+  const filter: Record<string, unknown> = {};
+
+  if (query.batch) filter.batch = query.batch;
+  if (query.grade) filter.grade = query.grade;
+
+  let userFilter: Record<string, unknown> | null = null;
+  if (query.search) {
+    userFilter = { name: { $regex: query.search, $options: 'i' } };
+  }
+
+  // If there's a name search, first find matching users
+  let userIds: string[] = [];
+  if (userFilter) {
+    const matchingUsers = await User.find(userFilter).select('_id').lean();
+    userIds = matchingUsers.map(u => u._id.toString());
+    
+    // If we searched by name but found no users, return empty early
+    if (userIds.length === 0) return [];
+    
+    filter.user = { $in: userIds };
+  }
+
+  const students = await Student.find(filter)
+    .populate('user', 'name email phone profilePicture')
+    .sort({ 'user.name': 1 })
+    .limit(50)
+    .lean();
+
+  return students;
+}
+
 export async function updateProfile(
   userId: string,
   data: { phone?: string; address?: string },
