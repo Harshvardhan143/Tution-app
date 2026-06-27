@@ -17,7 +17,7 @@ export function AppHeader({ title, showBack = true, rightAction }: AppHeaderProp
       <View style={styles.left}>
         {showBack && (
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <ChevronLeft size={24} color="#000" />
+            <ChevronLeft size={24} color="#ffffff" />
           </TouchableOpacity>
         )}
       </View>
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#fff', // Or transparent based on theme
+    backgroundColor: 'transparent',
   },
   left: {
     width: 40,
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1e293b',
+    color: '#ffffff',
     flex: 1,
     textAlign: 'center',
   },
