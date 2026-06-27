@@ -1,13 +1,14 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ActivityIndicator, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export interface GradientButtonProps extends TouchableOpacityProps {
   title: string;
   loading?: boolean;
+  icon?: React.ReactNode;
 }
 
-export function GradientButton({ title, loading, style, disabled, ...props }: GradientButtonProps) {
+export function GradientButton({ title, loading, icon, style, disabled, ...props }: GradientButtonProps) {
   return (
     <TouchableOpacity 
       style={[styles.button, (disabled || loading) && styles.disabled, style]} 
@@ -24,7 +25,10 @@ export function GradientButton({ title, loading, style, disabled, ...props }: Gr
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.text}>{title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            {icon}
+            <Text style={styles.text}>{title}</Text>
+          </View>
         )}
       </LinearGradient>
     </TouchableOpacity>
