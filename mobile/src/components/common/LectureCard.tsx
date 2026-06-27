@@ -9,14 +9,14 @@ export interface LectureCardProps {
   color?: string;
 }
 
-export function LectureCard({ subject, time, teacher, room, color = '#3b82f6' }: LectureCardProps) {
+export function LectureCard({ subject, time, teacher, room, color = '#6C63FF' }: LectureCardProps) {
   return (
     <View style={styles.container}>
       <View style={[styles.colorBar, { backgroundColor: color }]} />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.subject}>{subject}</Text>
-          <Text style={styles.time}>{time}</Text>
+          <Text style={[styles.time, { color }]}>{time}</Text>
         </View>
         <View style={styles.details}>
           <Text style={styles.teacher}>{teacher}</Text>
@@ -30,18 +30,13 @@ export function LectureCard({ subject, time, teacher, room, color = '#3b82f6' }:
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
-    marginVertical: 6,
+    marginVertical: 8,
     marginHorizontal: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   colorBar: {
     width: 6,
@@ -54,17 +49,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   subject: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#ffffff',
   },
   time: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#3b82f6',
   },
   details: {
     flexDirection: 'row',
@@ -73,13 +67,13 @@ const styles = StyleSheet.create({
   },
   teacher: {
     fontSize: 14,
-    color: '#64748b',
+    color: '#A0AEC0',
     fontWeight: '500',
   },
   room: {
     fontSize: 12,
-    color: '#94a3b8',
-    backgroundColor: '#f1f5f9',
+    color: '#A0AEC0',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
