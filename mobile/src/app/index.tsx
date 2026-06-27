@@ -8,10 +8,12 @@ export default function Index() {
     return <Redirect href="/(auth)/login" />;
   }
 
-  if (role === 'student') {
-    return <Redirect href="/(student)/dashboard" />;
-  } else if (role === 'staff') {
-    return <Redirect href="/(staff)/dashboard" />;
+  if (isAuthenticated && role) {
+    if (role === 'student') {
+      return <Redirect href="/(student)/dashboard" />;
+    } else if (role === 'staff') {
+      return <Redirect href="/(staff)/dashboard" />;
+    }
   }
 
   // Fallback

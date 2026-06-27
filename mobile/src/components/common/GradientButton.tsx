@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, TouchableOpacityProps, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export interface GradientButtonProps extends TouchableOpacityProps {
   title: string;
@@ -14,24 +15,38 @@ export function GradientButton({ title, loading, style, disabled, ...props }: Gr
       activeOpacity={0.8}
       {...props}
     >
-      {loading ? (
-        <ActivityIndicator color="#fff" />
-      ) : (
-        <Text style={styles.text}>{title}</Text>
-      )}
+      <LinearGradient
+        colors={['#6C63FF', '#4F46E5']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.gradient}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.text}>{title}</Text>
+        )}
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#3b82f6', // Fallback for gradient
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#6C63FF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  gradient: {
+    width: '100%',
+    paddingVertical: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
   },
   disabled: {
     opacity: 0.6,

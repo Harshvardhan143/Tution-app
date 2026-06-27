@@ -10,16 +10,19 @@ export interface InputFieldProps extends TextInputProps {
 
 export function InputField({ label, icon, isPassword, style, ...props }: InputFieldProps) {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, isFocused && styles.inputFocused]}>
         {icon && <View style={styles.iconContainer}>{icon}</View>}
         <TextInput
           style={[styles.input, style]}
           secureTextEntry={isPassword && !showPassword}
-          placeholderTextColor="#94a3b8"
+          placeholderTextColor="#4A5568"
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           {...props}
         />
         {isPassword && (
@@ -27,7 +30,7 @@ export function InputField({ label, icon, isPassword, style, ...props }: InputFi
             style={styles.eyeButton}
             onPress={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <EyeOff size={20} color="#64748b" /> : <Eye size={20} color="#64748b" />}
+            {showPassword ? <EyeOff size={20} color="#A0AEC0" /> : <Eye size={20} color="#A0AEC0" />}
           </TouchableOpacity>
         )}
       </View>
@@ -37,34 +40,38 @@ export function InputField({ label, icon, isPassword, style, ...props }: InputFi
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 20,
     width: '100%',
   },
   label: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#334155',
-    marginBottom: 6,
+    color: '#A0AEC0',
+    marginBottom: 8,
+    letterSpacing: 0.5,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f5f9',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
+  },
+  inputFocused: {
+    borderColor: 'rgba(108, 99, 255, 0.8)',
   },
   iconContainer: {
-    paddingLeft: 12,
+    paddingLeft: 16,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     fontSize: 16,
-    color: '#0f172a',
+    color: '#FFFFFF',
   },
   eyeButton: {
-    padding: 12,
+    padding: 16,
   },
 });
