@@ -46,23 +46,26 @@ const styles = StyleSheet.create({
   dateBlock: {
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 12,
-    backgroundColor: '#f1f5f9',
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedBlock: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#6C63FF',
+    borderColor: '#6C63FF',
   },
   dayText: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#A0AEC0',
     fontWeight: '500',
     marginBottom: 4,
   },
   dateText: {
     fontSize: 16,
-    color: '#0f172a',
+    color: '#ffffff',
     fontWeight: '700',
   },
   selectedText: {
