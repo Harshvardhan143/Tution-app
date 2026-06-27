@@ -12,10 +12,10 @@ export interface AttendanceRowProps {
 export function AttendanceRow({ date, day, slots }: AttendanceRowProps) {
   const getStatusColor = (status: AttendanceStatus) => {
     switch (status) {
-      case 'P': return { bg: '#dcfce7', text: '#166534' };
-      case 'A': return { bg: '#fee2e2', text: '#991b1b' };
-      case 'PN': return { bg: '#fef9c3', text: '#854d0e' };
-      default: return { bg: '#f1f5f9', text: '#64748b' };
+      case 'P': return { bg: '#10B981', text: '#ffffff' };
+      case 'A': return { bg: '#F43F5E', text: '#ffffff' };
+      case 'PN': return { bg: '#F59E0B', text: '#ffffff' };
+      default: return { bg: 'rgba(255,255,255,0.1)', text: '#A0AEC0' };
     }
   };
 
@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
   },
   dateContainer: {
     width: 60,
@@ -53,11 +53,11 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#ffffff',
   },
   day: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#A0AEC0',
     marginTop: 2,
   },
   slotsContainer: {
