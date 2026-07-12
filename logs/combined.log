@@ -1,0 +1,2 @@
+{"event":"login","ipAddress":"::1","level":"info","message":"Event: login | Outcome: success | Severity: info | User: 6a3f80892c5ed772b7396e80","outcome":"success","severity":"info","timestamp":"2026-07-10T10:18:53.238Z","userId":"6a3f80892c5ed772b7396e80"}
+{"event":"login","ipAddress":"::1","level":"info","message":"Event: login | Outcome: success | Severity: info | User: 6a3f80892c5ed772b7396e80","outcome":"success","severity":"info","timestamp":"2026-07-10T10:27:02.436Z","userId":"6a3f80892c5ed772b7396e80"}
