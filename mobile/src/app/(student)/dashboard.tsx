@@ -5,7 +5,6 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
-  Dimensions,
   SafeAreaView,
   StatusBar,
   useWindowDimensions,
