@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1A202C',
     height: '100%',
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     outlineStyle: 'none' as any, // fixes blue ring in web browser
   },
   eyeIcon: {
